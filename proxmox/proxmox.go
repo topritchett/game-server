@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -149,12 +150,12 @@ func PauseAllVMs(Auth, QemuUrl string) {
 		vmID := fmt.Sprint(vm.(map[string]interface{})["vmid"].(float64))
 		vmStatus := VMStatus(Auth, QemuUrl, vmID)
 		if vmStatus == "running" {
-			fmt.Println("Attempting to pause VM", vmID)
+			log.Println("Attempting to pause VM", vmID)
 			response, err := PauseVM(Auth, QemuUrl, vmID)
 			if err != nil {
 				fmt.Println("Error", err)
 			}
-			fmt.Println(response)
+			log.Println(response)
 		}
 	}
 }
