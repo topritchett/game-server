@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/topritchett/game-server/proxmox"
 	"github.com/topritchett/game-server/work"
@@ -34,7 +35,7 @@ func (h *Handler) registerRoutes() {
 }
 
 func (h *Handler) ServerStartVM(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", r.URL.Path)
+	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", escapeURL(r.URL.Path))
 	started, err := proxmox.StartVM(proxmox.Auth, proxmox.QemuUrl, "100")
 	if err != nil {
 		log.Println(err)
@@ -43,22 +44,28 @@ func (h *Handler) ServerStartVM(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HelloWorld(w http.ResponseWriter, r *http.Request) {
-	//w.Write([]byte("Hello World!"))
-	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", r.URL.Path)
+	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", escapeURL(r.URL.Path))
 	http.ServeFile(w, r, "./static/index.html")
 }
 
 func (h *Handler) ServerGetProxUrl(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", r.URL.Path)
+	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", escapeURL(r.URL.Path))
 	w.Write([]byte(proxmox.GetProxUrl(proxmox.Auth, proxmox.QemuUrl)))
 }
 
 func (h *Handler) ServerStartWork(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", r.URL.Path)
+	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", escapeURL(r.URL.Path))
 	w.Write([]byte(work.StartWorkVMs(proxmox.Auth, proxmox.QemuUrl)))
 }
 
 func (h *Handler) ServerPauseWork(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", r.URL.Path)
+	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", escapeURL(r.URL.Path))
 	w.Write([]byte(work.PauseWorkVMs(proxmox.Auth, proxmox.QemuUrl)))
+}
+
+// function to escape url
+func escapeURL(url string) string {
+	escapedURL := strings.Replace(url, "\n", "", -1)
+	escapedURL = strings.Replace(escapedURL, "\r", "", -1)
+	return escapedURL
 }
