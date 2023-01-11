@@ -17,15 +17,15 @@ type Handler struct {
 // New http handler
 func New(s *http.ServeMux) *Handler {
 	h := Handler{s}
-	h.registerRoutes()
+	h.registerWebRoutes()
 
 	return &h
 }
 
 // RegisterRoutes for all http endpoints
-func (h *Handler) registerRoutes() {
+func (h *Handler) registerWebRoutes() {
 	http.Handle("/static/", http.FileServer(http.Dir("static")))
-	h.mux.HandleFunc("/", h.HelloWorld)
+	h.mux.HandleFunc("/", h.handleRoot)
 
 	h.mux.HandleFunc("/startvm", h.ServerStartVM)
 
@@ -43,7 +43,7 @@ func (h *Handler) ServerStartVM(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(started))
 }
 
-func (h *Handler) HelloWorld(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) handleRoot(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method, http.StatusOK, "from", r.RemoteAddr, "to", escapeURL(r.URL.Path))
 	http.ServeFile(w, r, "./static/index.html")
 }
@@ -68,4 +68,14 @@ func escapeURL(url string) string {
 	escapedURL := strings.Replace(url, "\n", "", -1)
 	escapedURL = strings.Replace(escapedURL, "\r", "", -1)
 	return escapedURL
+}
+
+func checkMethod(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+			return
+		}
+		next.ServeHTTP(w, r)
+	}
 }

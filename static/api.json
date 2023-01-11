@@ -1,0 +1,46 @@
+{
+    "resources": [
+        {
+            "name": "vm",
+            "path": "/api/vm",
+            "operations": [
+                {
+                    "name": "start",
+                    "path": "/api/vm/start",
+                    "method": "POST",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "required": true
+                        }
+                    ]
+                },
+                {
+                    "name": "stop",
+                    "path": "/api/vm/stopvm",
+                    "method": "POST",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "required": true
+                        }
+                    ]
+                },
+                {
+                    "name": "status",
+                    "path": "/api/vm/status/{name}",
+                    "method": "GET",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string",
+                            "required": true
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
